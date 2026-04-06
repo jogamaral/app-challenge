@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "AutoPlano",
+    "slug": "autoplano",
+    "scheme": "autoplano",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#F5EFE6"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F5EFE6"
+      }
+    }
+  }
+}
