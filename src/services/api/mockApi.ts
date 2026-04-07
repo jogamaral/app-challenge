@@ -12,15 +12,7 @@ const db: {
   maintenance: MaintenanceItem[];
 } = {
   user: { id: "u1", name: "Joana Costa", email: "joana@autoplano.app" },
-  vehicle: {
-    id: "v1",
-    brand: "Honda",
-    model: "City",
-    year: 2020,
-    version: "EX",
-    currentKm: 58400,
-    monthlyKm: 1250,
-  },
+  vehicle: null,
   alertSettings: {
     leadDays: 7,
     annualReminders: true,

@@ -18,7 +18,7 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await login({ name, email });
-      router.replace("/");
+      router.replace("/(auth)/vehicle");
     } finally {
       setLoading(false);
     }
@@ -26,13 +26,13 @@ export default function LoginScreen() {
 
   return (
     <Screen>
-      <AppHeader eyebrow="Conta" title="Entre para ver o plano do seu carro" subtitle="Campos simples e objetivos para você começar rápido." />
+      <AppHeader eyebrow="Etapa 1 de 2" title="Crie sua conta" subtitle="Primeiro, informe seus dados. Em seguida, vamos cadastrar seu veículo." />
       <Card>
         <FormField label="Nome" value={name} onChangeText={setName} />
         <FormField label="E-mail" keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} />
         <FormField label="Senha" secureTextEntry value={password} onChangeText={setPassword} help="No MVP, o login é demonstrativo." />
       </Card>
-      <PrimaryButton title="Entrar" onPress={handleLogin} loading={loading} />
+      <PrimaryButton title="Continuar" onPress={handleLogin} loading={loading} />
     </Screen>
   );
 }

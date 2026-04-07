@@ -28,7 +28,10 @@ export default function SettingsScreen() {
   const saveMutation = useMutation({
     mutationFn: mockApi.saveAlertSettings,
     onSuccess: async () => {
-      await queryClient.invalidateQueries();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["alert-settings"] }),
+        queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
+      ]);
     },
   });
 

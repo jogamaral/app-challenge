@@ -17,6 +17,7 @@ import { Pressable, StyleSheet, Text } from "react-native";
 export default function DashboardScreen() {
   const { user, vehicle } = useApp();
   const dashboard = useQuery({ queryKey: ["dashboard"], queryFn: mockApi.getDashboard });
+  const alertSettings = useQuery({ queryKey: ["alert-settings"], queryFn: mockApi.getAlertSettings });
 
   return (
     <Screen>
@@ -26,7 +27,7 @@ export default function DashboardScreen() {
         subtitle="Entenda seu custo total do carro de forma rápida e sem complicação."
         right={
           <Pressable onPress={() => router.push("/(tabs)/settings")} style={styles.alertBadge}>
-            <Text style={styles.alertBadgeText}>7d</Text>
+            <Text style={styles.alertBadgeText}>{alertSettings.data?.leadDays ?? 7}d</Text>
           </Pressable>
         }
       />
@@ -36,7 +37,15 @@ export default function DashboardScreen() {
         <>
           <HeroReserveCard reserve={dashboard.data.reserveSuggestion} monthSpend={dashboard.data.monthSpend} yearSpend={dashboard.data.yearSpend} />
           <Card>
-            <SectionHeader title="Seu veículo" subtitle="Base usada para as previsões" />
+            <SectionHeader
+              title="Seu veículo"
+              subtitle="Base usada para as previsões"
+              right={
+                <Pressable onPress={() => router.push("/(auth)/vehicle")} style={styles.editVehicleButton}>
+                  <Text style={styles.editVehicleText}>Editar</Text>
+                </Pressable>
+              }
+            />
             <Text style={styles.vehicleTitle}>{vehicle?.brand} {vehicle?.model} {vehicle?.version} {vehicle?.year}</Text>
             <Text style={styles.vehicleMeta}>{vehicle?.currentKm.toLocaleString("pt-BR")} km atuais · {vehicle?.monthlyKm.toLocaleString("pt-BR")} km por mês</Text>
             <Text style={styles.protection}>Planejamento anual protegido em {dashboard.data.reserveCoverage}%</Text>
@@ -77,6 +86,19 @@ const styles = StyleSheet.create({
   vehicleMeta: {
     color: colors.textMuted,
     fontSize: 14,
+  },
+  editVehicleButton: {
+    minHeight: 34,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    backgroundColor: colors.surfaceMuted,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  editVehicleText: {
+    color: colors.primary,
+    fontSize: 13,
+    fontWeight: "800",
   },
   protection: {
     color: colors.success,
