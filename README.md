@@ -50,8 +50,21 @@ npm run start
 npm run android
 npm run ios
 npm run web
+npm run build:web
 npm run typecheck
 ```
+
+## Deploy no Netlify
+
+1. Crie um novo site no Netlify apontando para este repositório.
+2. O projeto já inclui `netlify.toml` com o comando de build e a pasta de publicação corretos.
+3. Se quiser testar antes do deploy, rode:
+
+```bash
+npm run build:web
+```
+
+O Netlify publicará a pasta `dist/` e a regra de redirect configurada faz o fallback para `index.html`, necessário para as rotas do `expo-router` no web.
 
 ## Estrutura
 
