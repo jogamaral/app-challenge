@@ -26,10 +26,10 @@ export function Screen({ children, scroll = true, padded = true }: Props) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: colors.text,
+    backgroundColor: "#000000",
   },
   statusBarFill: {
-    backgroundColor: colors.text,
+    backgroundColor: "#000000",
   },
   safeArea: {
     flex: 1,

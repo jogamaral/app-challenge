@@ -1,5 +1,6 @@
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Card } from "@/components/ui/Card";
+import { DateField } from "@/components/ui/DateField";
 import { FormField } from "@/components/ui/FormField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { Screen } from "@/components/ui/Screen";
@@ -41,7 +42,7 @@ export default function NewExpenseScreen() {
           ))}
         </View>
         <FormField label="Valor" keyboardType="decimal-pad" value={amount} onChangeText={setAmount} />
-        <FormField label="Data" value={date} onChangeText={setDate} help="Use o formato AAAA-MM-DD" />
+        <DateField label="Data" value={date} onChange={setDate} help="Toque para escolher no calendário" />
         <FormField label="Observação" value={note} onChangeText={setNote} />
       </Card>
       <PrimaryButton title="Salvar gasto" loading={createMutation.isPending} onPress={() => createMutation.mutate({ category, amount: Number(amount), date, note })} />

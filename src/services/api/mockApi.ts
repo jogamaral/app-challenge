@@ -33,12 +33,7 @@ const db: {
     { id: "a3", type: "Assistência 24h", value: 390, dueDate: "2026-08-10" },
     { id: "a4", type: "IPVA", value: 2350, dueDate: "2027-01-18" },
   ],
-  expenses: [
-    { id: "e1", category: "Combustível", amount: 320, date: "2026-03-17", note: "Abastecimento semanal" },
-    { id: "e2", category: "Estacionamento/Pedágio", amount: 96, date: "2026-03-16", note: "Pedágios da semana" },
-    { id: "e3", category: "Lavagem", amount: 48, date: "2026-03-12", note: "Lavagem completa" },
-    { id: "e4", category: "Manutenção", amount: 278, date: "2026-03-03", note: "Alinhamento e balanceamento" },
-  ],
+  expenses: [],
   maintenance: [
     { id: "m1", type: "Troca de óleo", intervalKm: 10000, intervalMonths: 6, lastKm: 52000, lastDate: "2025-11-20", estimatedCost: 320, status: "upcoming" },
     { id: "m2", type: "Filtros", intervalKm: 10000, intervalMonths: 6, lastKm: 52000, lastDate: "2025-11-20", estimatedCost: 180, status: "upcoming" },

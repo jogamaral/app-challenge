@@ -62,7 +62,7 @@ export const buildDashboardSummary = (
 ): DashboardSummary => {
   const monthKey = TODAY.toISOString().slice(0, 7);
   const monthSpend = expenses.filter((item) => item.date.startsWith(monthKey)).reduce((sum, item) => sum + item.amount, 0);
-  const yearSpend = expenses.reduce((sum, item) => sum + item.amount, 0) + 8188;
+  const yearSpend = expenses.reduce((sum, item) => sum + item.amount, 0);
   const upcoming = buildUpcomingEvents(annualExpenses, maintenance, vehicle);
   const annualTotal = annualExpenses.reduce((sum, item) => sum + item.value, 0);
   const maintenanceTotal = maintenance.reduce((sum, item) => sum + item.estimatedCost, 0);
