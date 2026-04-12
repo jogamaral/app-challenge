@@ -2,7 +2,7 @@ import { inputDate, toIsoDate } from "@/lib/format";
 import { colors, radii, spacing } from "@/theme/tokens";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { useMemo, useState } from "react";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, TextInputProps, View } from "react-native";
 import { FormField } from "./FormField";
 
 type Props = {
@@ -17,7 +17,13 @@ export function DateField({ label, value, onChange, help }: Props) {
   const selectedDate = useMemo(() => new Date(`${value}T12:00:00`), [value]);
 
   if (Platform.OS === "web") {
-    return <FormField label={label} value={value} onChangeText={onChange} help={help ?? "Use o formato AAAA-MM-DD"} />;
+    const webDateInputProps: TextInputProps & { type?: string; min?: string; max?: string } = {
+      type: "date",
+      min: "1900-01-01",
+      max: "2100-12-31",
+    };
+
+    return <FormField label={label} value={value} onChangeText={onChange} help={help ?? "Clique para abrir o calendário do navegador."} {...webDateInputProps} />;
   }
 
   const handleChange = (event: DateTimePickerEvent, nextDate?: Date) => {
