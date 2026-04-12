@@ -95,6 +95,10 @@ export const mockApi = {
 
   async createExpense(payload: { category: ExpenseCategory; amount: number; date: string; note?: string }) {
     await wait();
+    if (!Number.isFinite(payload.amount) || payload.amount <= 0) {
+      throw new Error("Valor da despesa invalido");
+    }
+
     const expense: Expense = { id: `e${Date.now()}`, ...payload };
     db.expenses.unshift(expense);
     persistDb();

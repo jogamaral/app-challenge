@@ -15,11 +15,29 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const categories: ExpenseCategory[] = ["Combustível", "Manutenção", "Documentação", "Seguro", "Estacionamento/Pedágio", "Lavagem", "Outros"];
 
+const sanitizeAmountInput = (value: string) => {
+  const normalized = value.replace(/,/g, ".").replace(/[^0-9.]/g, "");
+  const [integerPart = "", ...decimalParts] = normalized.split(".");
+  const decimals = decimalParts.join("").slice(0, 2);
+
+  if (normalized.startsWith(".")) {
+    return decimals ? `0.${decimals}` : "0.";
+  }
+
+  if (normalized.includes(".")) {
+    return `${integerPart}.${decimals}`;
+  }
+
+  return integerPart;
+};
+
 export default function NewExpenseScreen() {
   const [category, setCategory] = useState<ExpenseCategory>("Combustível");
-  const [amount, setAmount] = useState("0");
+  const [amount, setAmount] = useState("");
   const [date, setDate] = useState("2026-03-19");
   const [note, setNote] = useState("");
+  const parsedAmount = Number(amount);
+  const isAmountValid = Number.isFinite(parsedAmount) && parsedAmount > 0;
 
   const createMutation = useMutation({
     mutationFn: mockApi.createExpense,
@@ -41,11 +59,24 @@ export default function NewExpenseScreen() {
             </Pressable>
           ))}
         </View>
-        <FormField label="Valor" keyboardType="decimal-pad" value={amount} onChangeText={setAmount} />
+        <FormField
+          label="Valor"
+          keyboardType="decimal-pad"
+          inputMode="decimal"
+          value={amount}
+          onChangeText={(value) => setAmount(sanitizeAmountInput(value))}
+          placeholder="Ex.: 120.50"
+          help="Aceita apenas valores positivos."
+        />
         <DateField label="Data" value={date} onChange={setDate} help="Toque para escolher no calendário" />
         <FormField label="Observação" value={note} onChangeText={setNote} />
       </Card>
-      <PrimaryButton title="Salvar gasto" loading={createMutation.isPending} onPress={() => createMutation.mutate({ category, amount: Number(amount), date, note })} />
+      <PrimaryButton
+        title="Salvar gasto"
+        loading={createMutation.isPending}
+        disabled={!isAmountValid}
+        onPress={() => createMutation.mutate({ category, amount: parsedAmount, date, note })}
+      />
     </Screen>
   );
 }
