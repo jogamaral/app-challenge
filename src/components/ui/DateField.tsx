@@ -27,7 +27,7 @@ export function DateField({ label, value, onChange, help }: Props) {
           onChange={(event: ChangeEvent<HTMLInputElement>) => onChange(event.currentTarget.value)}
           style={webInputStyle}
         />
-        <Text style={styles.help}>{help ?? "Clique para abrir o calendario do navegador."}</Text>
+        <Text style={styles.help}>{help ?? "Clique para abrir o calendário do navegador."}</Text>
       </View>
     );
   }
