@@ -1,16 +1,20 @@
+import { readJson, writeJson } from "@/lib/persistence";
 import { buildDashboardSummary, buildUpcomingEvents, getMaintenanceForecast } from "@/lib/forecast";
 import { AlertSettings, AnnualExpense, DashboardSummary, Expense, ExpenseCategory, MaintenanceItem, UpcomingEvent, User, Vehicle } from "@/types/models";
 
 const wait = (ms = 450) => new Promise((resolve) => setTimeout(resolve, ms));
+const MOCK_DB_STORAGE_KEY = "autoplano.mock-db";
 
-const db: {
+type MockDb = {
   user: User;
   vehicle: Vehicle | null;
   alertSettings: AlertSettings;
   annualExpenses: AnnualExpense[];
   expenses: Expense[];
   maintenance: MaintenanceItem[];
-} = {
+};
+
+const initialDb: MockDb = {
   user: { id: "u1", name: "Joana Costa", email: "joana@autoplano.app" },
   vehicle: null,
   alertSettings: {
@@ -35,11 +39,27 @@ const db: {
   ],
 };
 
+const persistedDb = readJson<Partial<MockDb> | null>(MOCK_DB_STORAGE_KEY, null);
+
+const db: MockDb = {
+  ...initialDb,
+  ...persistedDb,
+  user: persistedDb?.user ?? initialDb.user,
+  vehicle: persistedDb?.vehicle ?? initialDb.vehicle,
+  alertSettings: persistedDb?.alertSettings ?? initialDb.alertSettings,
+  annualExpenses: persistedDb?.annualExpenses ?? initialDb.annualExpenses,
+  expenses: persistedDb?.expenses ?? initialDb.expenses,
+  maintenance: persistedDb?.maintenance ?? initialDb.maintenance,
+};
+
+const persistDb = () => writeJson(MOCK_DB_STORAGE_KEY, db);
+
 export const mockApi = {
   async login(payload: { name: string; email: string }) {
     await wait();
     db.user.name = payload.name;
     db.user.email = payload.email;
+    persistDb();
     return db.user;
   },
 
@@ -56,6 +76,7 @@ export const mockApi = {
   async saveVehicle(payload: Omit<Vehicle, "id">) {
     await wait();
     db.vehicle = { id: db.vehicle?.id ?? "v1", ...payload };
+    persistDb();
     return db.vehicle;
   },
 
@@ -76,6 +97,7 @@ export const mockApi = {
     await wait();
     const expense: Expense = { id: `e${Date.now()}`, ...payload };
     db.expenses.unshift(expense);
+    persistDb();
     return expense;
   },
 
@@ -114,6 +136,7 @@ export const mockApi = {
       date: "2026-03-19",
       note: `${item.type} realizada`,
     });
+    persistDb();
     return item;
   },
 
@@ -125,6 +148,7 @@ export const mockApi = {
   async saveAlertSettings(payload: AlertSettings) {
     await wait();
     db.alertSettings = payload;
+    persistDb();
     return db.alertSettings;
   },
 
