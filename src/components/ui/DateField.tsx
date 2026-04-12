@@ -1,9 +1,8 @@
 import { inputDate, toIsoDate } from "@/lib/format";
 import { colors, radii, spacing } from "@/theme/tokens";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
-import { useMemo, useState } from "react";
+import { ChangeEvent, CSSProperties, useMemo, useState } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
-import { FormField } from "./FormField";
 
 type Props = {
   label: string;
@@ -17,7 +16,20 @@ export function DateField({ label, value, onChange, help }: Props) {
   const selectedDate = useMemo(() => new Date(`${value}T12:00:00`), [value]);
 
   if (Platform.OS === "web") {
-    return <FormField label={label} value={value} onChangeText={onChange} help={help ?? "Use o formato AAAA-MM-DD"} />;
+    return (
+      <View style={styles.wrap}>
+        <Text style={styles.label}>{label}</Text>
+        <input
+          type="date"
+          min="1900-01-01"
+          max="2100-12-31"
+          value={value}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => onChange(event.currentTarget.value)}
+          style={webInputStyle}
+        />
+        <Text style={styles.help}>{help ?? "Clique para abrir o calendario do navegador."}</Text>
+      </View>
+    );
   }
 
   const handleChange = (event: DateTimePickerEvent, nextDate?: Date) => {
@@ -98,3 +110,18 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
 });
+
+const webInputStyle: CSSProperties = {
+  minHeight: 52,
+  width: "100%",
+  borderRadius: radii.md,
+  backgroundColor: colors.surface,
+  borderWidth: 1,
+  borderStyle: "solid",
+  borderColor: colors.border,
+  paddingLeft: spacing.md,
+  paddingRight: spacing.md,
+  fontSize: 15,
+  color: colors.text,
+  boxSizing: "border-box",
+};
