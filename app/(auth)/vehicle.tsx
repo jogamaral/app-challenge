@@ -10,6 +10,8 @@ import { mockApi } from "@/services/api/mockApi";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 
+const sanitizeKmInput = (value: string) => value.replace(/[^0-9]/g, "");
+
 export default function VehicleScreen() {
   const { setVehicle, vehicle } = useApp();
   const isEditing = Boolean(vehicle);
@@ -36,6 +38,13 @@ export default function VehicleScreen() {
   }, [vehicle]);
 
   const handleSave = async () => {
+    const parsedCurrentKm = Number(currentKm);
+    const parsedMonthlyKm = Number(monthlyKm);
+
+    if (parsedCurrentKm < 0 || parsedMonthlyKm < 0) {
+      return;
+    }
+
     setLoading(true);
     try {
       const vehicle = await mockApi.saveVehicle({
@@ -43,8 +52,8 @@ export default function VehicleScreen() {
         model: model.trim(),
         year: Number(year),
         version: version.trim(),
-        currentKm: Number(currentKm),
-        monthlyKm: Number(monthlyKm),
+        currentKm: parsedCurrentKm,
+        monthlyKm: parsedMonthlyKm,
       });
       setVehicle(vehicle);
       await queryClient.invalidateQueries();
@@ -142,8 +151,24 @@ export default function VehicleScreen() {
           searchPlaceholder="Busque pela versão"
           emptyText="Nenhuma versão encontrada para esse ano."
         />
-        <FormField label="Quilometragem atual" keyboardType="number-pad" value={currentKm} onChangeText={setCurrentKm} placeholder="Ex.: 58400" />
-        <FormField label="Média de km por mês" keyboardType="number-pad" value={monthlyKm} onChangeText={setMonthlyKm} placeholder="Ex.: 1250" />
+        <FormField
+          label="Quilometragem atual"
+          keyboardType="number-pad"
+          inputMode="numeric"
+          value={currentKm}
+          onChangeText={(value) => setCurrentKm(sanitizeKmInput(value))}
+          placeholder="Ex.: 58400"
+          help="Aceita apenas valores inteiros e positivos."
+        />
+        <FormField
+          label="Média de km por mês"
+          keyboardType="number-pad"
+          inputMode="numeric"
+          value={monthlyKm}
+          onChangeText={(value) => setMonthlyKm(sanitizeKmInput(value))}
+          placeholder="Ex.: 1250"
+          help="Aceita apenas valores inteiros e positivos."
+        />
       </Card>
       <PrimaryButton title={isEditing ? "Salvar alterações" : "Salvar e abrir painel"} onPress={handleSave} loading={loading} disabled={isDisabled} />
     </Screen>
