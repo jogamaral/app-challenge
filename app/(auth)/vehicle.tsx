@@ -2,11 +2,13 @@ import { AppHeader } from "@/components/ui/AppHeader";
 import { Card } from "@/components/ui/Card";
 import { FormField } from "@/components/ui/FormField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import { SearchableSelectField } from "@/components/ui/SearchableSelectField";
 import { Screen } from "@/components/ui/Screen";
+import { ensureVehicleInCatalog, getBrandOptions, getModelOptions, getVersionOptions, getYearOptions, vehicleCatalog } from "@/data/vehicleCatalog";
 import { queryClient, useApp } from "@/providers/AppProvider";
 import { mockApi } from "@/services/api/mockApi";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export default function VehicleScreen() {
   const { setVehicle, vehicle } = useApp();
@@ -18,6 +20,11 @@ export default function VehicleScreen() {
   const [currentKm, setCurrentKm] = useState(vehicle?.currentKm ? String(vehicle.currentKm) : "");
   const [monthlyKm, setMonthlyKm] = useState(vehicle?.monthlyKm ? String(vehicle.monthlyKm) : "");
   const [loading, setLoading] = useState(false);
+  const catalog = useMemo(() => ensureVehicleInCatalog(vehicleCatalog, vehicle), [vehicle]);
+  const brandOptions = useMemo(() => getBrandOptions(catalog), [catalog]);
+  const modelOptions = useMemo(() => getModelOptions(catalog, brand), [catalog, brand]);
+  const yearOptions = useMemo(() => getYearOptions(catalog, brand, model), [catalog, brand, model]);
+  const versionOptions = useMemo(() => getVersionOptions(catalog, brand, model, year), [catalog, brand, model, year]);
 
   useEffect(() => {
     setBrand(vehicle?.brand ?? "");
@@ -52,7 +59,37 @@ export default function VehicleScreen() {
     }
   };
 
-  const isDisabled = !brand.trim() || !model.trim() || !year.trim() || !currentKm.trim() || !monthlyKm.trim();
+  const handleBrandChange = (nextBrand: string) => {
+    if (nextBrand === brand) {
+      return;
+    }
+
+    setBrand(nextBrand);
+    setModel("");
+    setYear("");
+    setVersion("");
+  };
+
+  const handleModelChange = (nextModel: string) => {
+    if (nextModel === model) {
+      return;
+    }
+
+    setModel(nextModel);
+    setYear("");
+    setVersion("");
+  };
+
+  const handleYearChange = (nextYear: string) => {
+    if (nextYear === year) {
+      return;
+    }
+
+    setYear(nextYear);
+    setVersion("");
+  };
+
+  const isDisabled = !brand.trim() || !model.trim() || !year.trim() || !version.trim() || !currentKm.trim() || !monthlyKm.trim();
 
   return (
     <Screen>
@@ -62,10 +99,49 @@ export default function VehicleScreen() {
         subtitle={isEditing ? "Atualize os dados usados para previsões, agenda e reserva mensal." : "Esses dados ajudam o app a prever manutenções e sugerir uma reserva mensal."}
       />
       <Card>
-        <FormField label="Marca" value={brand} onChangeText={setBrand} placeholder="Ex.: Honda" />
-        <FormField label="Modelo" value={model} onChangeText={setModel} placeholder="Ex.: City" />
-        <FormField label="Ano" keyboardType="number-pad" value={year} onChangeText={setYear} placeholder="Ex.: 2020" />
-        <FormField label="Versão" value={version} onChangeText={setVersion} placeholder="Ex.: EX" />
+        <SearchableSelectField
+          label="Marca"
+          value={brand}
+          options={brandOptions}
+          onChange={handleBrandChange}
+          placeholder="Selecione a marca"
+          help="Escolha a fabricante do seu veículo."
+          searchPlaceholder="Busque pela marca"
+          emptyText="Nenhuma marca encontrada."
+        />
+        <SearchableSelectField
+          label="Modelo"
+          value={model}
+          options={modelOptions}
+          onChange={handleModelChange}
+          placeholder="Selecione o modelo"
+          help={brand ? "Mostrando modelos compatíveis com a marca selecionada." : "Selecione a marca para liberar os modelos."}
+          disabled={!brand}
+          searchPlaceholder="Busque pelo modelo"
+          emptyText="Nenhum modelo encontrado para essa marca."
+        />
+        <SearchableSelectField
+          label="Ano"
+          value={year}
+          options={yearOptions}
+          onChange={handleYearChange}
+          placeholder="Selecione o ano"
+          help={model ? "Escolha o ano exato da versão do seu carro." : "Selecione o modelo para liberar os anos."}
+          disabled={!model}
+          searchPlaceholder="Busque pelo ano"
+          emptyText="Nenhum ano encontrado para esse modelo."
+        />
+        <SearchableSelectField
+          label="Versão"
+          value={version}
+          options={versionOptions}
+          onChange={setVersion}
+          placeholder="Selecione a versão"
+          help={year ? "Mostrando as versões disponíveis para o ano selecionado." : "Selecione o ano para liberar as versões."}
+          disabled={!year}
+          searchPlaceholder="Busque pela versão"
+          emptyText="Nenhuma versão encontrada para esse ano."
+        />
         <FormField label="Quilometragem atual" keyboardType="number-pad" value={currentKm} onChangeText={setCurrentKm} placeholder="Ex.: 58400" />
         <FormField label="Média de km por mês" keyboardType="number-pad" value={monthlyKm} onChangeText={setMonthlyKm} placeholder="Ex.: 1250" />
       </Card>
