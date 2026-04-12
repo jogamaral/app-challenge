@@ -11,14 +11,19 @@ import { currency, shortDate } from "@/lib/format";
 import { mockApi } from "@/services/api/mockApi";
 import { colors, radii, spacing } from "@/theme/tokens";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function AgendaScreen() {
   const maintenance = useQuery({ queryKey: ["maintenance"], queryFn: mockApi.getMaintenance });
+  const [activeMaintenanceId, setActiveMaintenanceId] = useState<string | null>(null);
   const complete = useMutation({
     mutationFn: mockApi.completeMaintenance,
     onSuccess: async () => {
       await queryClient.invalidateQueries();
+    },
+    onSettled: () => {
+      setActiveMaintenanceId(null);
     },
   });
 
@@ -41,7 +46,16 @@ export default function AgendaScreen() {
             <Text style={styles.itemText}>{item.forecast.kmRemaining !== undefined ? `${item.forecast.kmRemaining} km restantes` : `Até ${shortDate(item.forecast.nextDate.toISOString().slice(0, 10))}`}</Text>
             <Text style={styles.itemText}>Custo estimado {currency(item.estimatedCost)}</Text>
             <Text style={styles.itemText}>Última realização em {shortDate(item.lastDate)}</Text>
-            <PrimaryButton title="Marcar como realizada" variant="secondary" loading={complete.isPending} onPress={() => complete.mutate(item.id)} />
+            <PrimaryButton
+              title="Marcar como realizada"
+              variant="secondary"
+              loading={activeMaintenanceId === item.id && complete.isPending}
+              disabled={complete.isPending}
+              onPress={() => {
+                setActiveMaintenanceId(item.id);
+                complete.mutate(item.id);
+              }}
+            />
           </View>
         ))}
       </Card>
