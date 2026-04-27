@@ -1,4 +1,5 @@
 import { readJson, writeJson } from "@/lib/persistence";
+import { buildMaintenanceFromPlan, getMaintenancePlanForVehicle } from "@/data/maintenancePlans";
 import { buildDashboardSummary, buildUpcomingEvents, getMaintenanceForecast } from "@/lib/forecast";
 import { AlertSettings, AnnualExpense, DashboardSummary, Expense, ExpenseCategory, MaintenanceItem, UpcomingEvent, User, Vehicle } from "@/types/models";
 
@@ -31,11 +32,11 @@ const initialDb: MockDb = {
   ],
   expenses: [],
   maintenance: [
-    { id: "m1", type: "Troca de óleo", intervalKm: 10000, intervalMonths: 6, lastKm: 52000, lastDate: "2025-11-20", estimatedCost: 320, status: "upcoming" },
-    { id: "m2", type: "Filtros", intervalKm: 10000, intervalMonths: 6, lastKm: 52000, lastDate: "2025-11-20", estimatedCost: 180, status: "upcoming" },
-    { id: "m3", type: "Freios", intervalKm: 20000, intervalMonths: 12, lastKm: 42000, lastDate: "2025-05-14", estimatedCost: 760, status: "warning" },
-    { id: "m4", type: "Pneus", intervalKm: 40000, intervalMonths: 24, lastKm: 24000, lastDate: "2024-06-05", estimatedCost: 2400, status: "upcoming" },
-    { id: "m5", type: "Bateria", intervalMonths: 36, lastKm: 31000, lastDate: "2023-09-08", estimatedCost: 620, status: "warning" },
+    { id: "m1", type: "Troca de óleo", intervalKm: 10000, intervalMonths: 6, lastKm: 52000, lastDate: "2025-11-20", estimatedCost: 320, status: "upcoming", source: "generic" },
+    { id: "m2", type: "Filtros", intervalKm: 10000, intervalMonths: 6, lastKm: 52000, lastDate: "2025-11-20", estimatedCost: 180, status: "upcoming", source: "generic" },
+    { id: "m3", type: "Freios", intervalKm: 20000, intervalMonths: 12, lastKm: 42000, lastDate: "2025-05-14", estimatedCost: 760, status: "warning", source: "generic" },
+    { id: "m4", type: "Pneus", intervalKm: 40000, intervalMonths: 24, lastKm: 24000, lastDate: "2024-06-05", estimatedCost: 2400, status: "upcoming", source: "generic" },
+    { id: "m5", type: "Bateria", intervalMonths: 36, lastKm: 31000, lastDate: "2023-09-08", estimatedCost: 620, status: "warning", source: "generic" },
   ],
 };
 
@@ -76,6 +77,12 @@ export const mockApi = {
   async saveVehicle(payload: Omit<Vehicle, "id">) {
     await wait();
     db.vehicle = { id: db.vehicle?.id ?? "v1", ...payload };
+    const maintenancePlan = getMaintenancePlanForVehicle(db.vehicle);
+    if (maintenancePlan) {
+      db.maintenance = buildMaintenanceFromPlan(db.vehicle, maintenancePlan);
+    } else if (db.maintenance.every((item) => item.source === "manufacturer_manual")) {
+      db.maintenance = initialDb.maintenance.map((item) => ({ ...item }));
+    }
     persistDb();
     return db.vehicle;
   },
@@ -133,6 +140,7 @@ export const mockApi = {
     item.lastDate = "2026-03-19";
     item.lastKm = db.vehicle.currentKm;
     item.status = "upcoming";
+    item.isEstimatedFromCurrentKm = false;
     db.expenses.unshift({
       id: `e${Date.now()}`,
       category: "Manutenção",

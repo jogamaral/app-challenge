@@ -11,7 +11,12 @@ const addMonths = (date: Date, amount: number) => {
 export const getMaintenanceForecast = (item: MaintenanceItem, vehicle: Vehicle) => {
   const nextKm = item.intervalKm ? item.lastKm + item.intervalKm : undefined;
   const kmRemaining = nextKm ? Math.max(0, nextKm - vehicle.currentKm) : undefined;
-  const monthsByKm = kmRemaining !== undefined && vehicle.monthlyKm > 0 ? Math.ceil(kmRemaining / vehicle.monthlyKm) : undefined;
+  const monthsByKm =
+    kmRemaining === 0
+      ? 0
+      : kmRemaining !== undefined && vehicle.monthlyKm > 0
+        ? Math.ceil(kmRemaining / vehicle.monthlyKm)
+        : undefined;
   const dateByKm = monthsByKm !== undefined ? addMonths(TODAY, monthsByKm) : undefined;
   const dateByTime = item.intervalMonths ? addMonths(new Date(`${item.lastDate}T12:00:00`), item.intervalMonths) : undefined;
   const nextDate = [dateByKm, dateByTime].filter(Boolean).sort((a, b) => Number(a) - Number(b))[0] ?? TODAY;

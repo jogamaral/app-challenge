@@ -43,9 +43,12 @@ export default function AgendaScreen() {
                 <Text style={styles.statusText}>{item.status === "warning" ? "Atenção" : "Próximo"}</Text>
               </View>
             </View>
+            {item.source === "manufacturer_manual" ? <Text style={styles.sourceText}>{item.sourceLabel ?? "Plano do manual do fabricante"}</Text> : null}
+            {item.isEstimatedFromCurrentKm ? <Text style={styles.estimateText}>Previsão inicial baseada na quilometragem atual.</Text> : null}
             <Text style={styles.itemText}>{item.forecast.kmRemaining !== undefined ? `${item.forecast.kmRemaining} km restantes` : `Até ${shortDate(item.forecast.nextDate.toISOString().slice(0, 10))}`}</Text>
             <Text style={styles.itemText}>Custo estimado {currency(item.estimatedCost)}</Text>
             <Text style={styles.itemText}>Última realização em {shortDate(item.lastDate)}</Text>
+            {item.manualReference ? <Text style={styles.referenceText}>{item.manualReference}</Text> : null}
             <PrimaryButton
               title="Marcar como realizada"
               variant="secondary"
@@ -86,6 +89,21 @@ const styles = StyleSheet.create({
   itemText: {
     color: colors.textMuted,
     fontSize: 14,
+  },
+  sourceText: {
+    color: colors.primary,
+    fontSize: 13,
+    fontWeight: "800",
+  },
+  estimateText: {
+    color: colors.textMuted,
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  referenceText: {
+    color: colors.textMuted,
+    fontSize: 12,
+    lineHeight: 17,
   },
   status: {
     borderRadius: radii.pill,

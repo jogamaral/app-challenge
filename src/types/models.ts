@@ -9,6 +9,8 @@ export type ExpenseCategory =
 
 export type UpcomingType = "annual" | "maintenance";
 
+export type MaintenanceSource = "manufacturer_manual" | "generic";
+
 export type User = {
   id: string;
   name: string;
@@ -49,6 +51,32 @@ export type MaintenanceItem = {
   lastDate: string;
   estimatedCost: number;
   status: "upcoming" | "warning" | "done";
+  source?: MaintenanceSource;
+  sourceLabel?: string;
+  isEstimatedFromCurrentKm?: boolean;
+  manualReference?: string;
+  sourceUrl?: string;
+};
+
+export type MaintenancePlanItem = {
+  id: string;
+  type: string;
+  intervalKm?: number;
+  intervalMonths?: number;
+  estimatedCost: number;
+};
+
+export type MaintenancePlan = {
+  id: string;
+  brand: string;
+  model: string;
+  year: number;
+  source: "manufacturer_manual";
+  sourceLabel: string;
+  manualReference: string;
+  sourceUrl: string;
+  extractedAt: string;
+  items: MaintenancePlanItem[];
 };
 
 export type AlertSettings = {
