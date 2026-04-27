@@ -9,6 +9,8 @@ export type ExpenseCategory =
 
 export type UpcomingType = "annual" | "maintenance";
 
+export type AdPlacement = "auth_banner" | "dashboard_banner" | "expenses_inline";
+
 export type MaintenanceSource = "manufacturer_manual" | "generic";
 
 export type User = {
@@ -102,4 +104,32 @@ export type DashboardSummary = {
   reserveSuggestion: number;
   reserveCoverage: number;
   nextEvents: UpcomingEvent[];
+};
+
+export type MockAd = {
+  id: string;
+  placement: AdPlacement;
+  title: string;
+  description: string;
+  cta: string;
+  sponsor: string;
+  actionSlug: string;
+  externalUrl: string;
+  actionUrl?: string;
+  variant: "banner" | "card";
+};
+
+export type MockAdLandingPage = {
+  slug: string;
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  sponsor: string;
+  offerLabel: string;
+  primaryCta: string;
+  secondaryCta: string;
+  heroDescription: string;
+  benefits: string[];
+  steps: string[];
+  disclaimer: string;
 };

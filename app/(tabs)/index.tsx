@@ -1,3 +1,4 @@
+import { AdBanner } from "@/components/ui/AdBanner";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Card } from "@/components/ui/Card";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -9,15 +10,34 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { UpcomingEventItem } from "@/components/ui/ListItems";
 import { useApp } from "@/providers/AppProvider";
 import { mockApi } from "@/services/api/mockApi";
+import { mockAds } from "@/services/ads/mockAds";
 import { colors } from "@/theme/tokens";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Linking, Pressable, StyleSheet, Text } from "react-native";
 
 export default function DashboardScreen() {
   const { user, vehicle } = useApp();
   const dashboard = useQuery({ queryKey: ["dashboard"], queryFn: mockApi.getDashboard });
   const alertSettings = useQuery({ queryKey: ["alert-settings"], queryFn: mockApi.getAlertSettings });
+  const dashboardAd = useQuery({
+    queryKey: ["ads", "dashboard_banner"],
+    queryFn: () => mockAds.getAd("dashboard_banner"),
+    enabled: mockAds.isEnabled(),
+  });
+  const handleAdPress = () => {
+    if (!dashboardAd.data) {
+      return;
+    }
+
+    const href = mockAds.getClickHref(dashboardAd.data);
+    if (href.startsWith("/")) {
+      router.push(href);
+      return;
+    }
+
+    Linking.openURL(href);
+  };
 
   return (
     <Screen>
@@ -31,6 +51,7 @@ export default function DashboardScreen() {
           </Pressable>
         }
       />
+      {dashboardAd.data ? <AdBanner ad={dashboardAd.data} onPress={handleAdPress} /> : null}
       {dashboard.isLoading ? <LoadingState message="Montando seu painel financeiro..." /> : null}
        {dashboard.isError ? <ErrorState title="Não foi possível carregar o painel" description="Verifique sua conexão e tente de novo." onRetry={() => dashboard.refetch()} /> : null}
       {dashboard.data ? (

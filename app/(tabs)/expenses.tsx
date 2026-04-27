@@ -1,3 +1,4 @@
+import { AdBanner } from "@/components/ui/AdBanner";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -8,16 +9,37 @@ import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { Screen } from "@/components/ui/Screen";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { mockApi } from "@/services/api/mockApi";
+import { mockAds } from "@/services/ads/mockAds";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
+import { Linking } from "react-native";
 
 export default function ExpensesScreen() {
   const expenses = useQuery({ queryKey: ["expenses"], queryFn: mockApi.getExpenses });
+  const inlineAd = useQuery({
+    queryKey: ["ads", "expenses_inline"],
+    queryFn: () => mockAds.getAd("expenses_inline"),
+    enabled: mockAds.isEnabled(),
+  });
+  const handleAdPress = () => {
+    if (!inlineAd.data) {
+      return;
+    }
+
+    const href = mockAds.getClickHref(inlineAd.data);
+    if (href.startsWith("/")) {
+      router.push(href);
+      return;
+    }
+
+    Linking.openURL(href);
+  };
 
   return (
     <Screen>
       <AppHeader eyebrow="Gastos" title="Registre e acompanhe seus lançamentos" subtitle="Categorias simples para manter o controle sem se perder." />
       <PrimaryButton title="Novo gasto" onPress={() => router.push("/expense/new")} />
+      {inlineAd.data ? <AdBanner ad={inlineAd.data} onPress={handleAdPress} /> : null}
       <Card>
         <SectionHeader title="Últimos gastos" subtitle="Histórico recente do veículo" />
         {expenses.isLoading ? <LoadingState /> : null}

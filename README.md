@@ -89,3 +89,4 @@ O projeto já está preparado para API REST:
 - o MVP atual usa dados mockados em memória
 - o fluxo já contempla estados de loading, vazio e erro
 - o app foi desenhado com foco em usuários leigos: linguagem simples, poucos campos e destaque para reserva mensal, gastos e próximos compromissos
+- o mock de anúncios pode ser desligado com `EXPO_PUBLIC_ENABLE_MOCK_ADS=false`
