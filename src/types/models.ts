@@ -11,7 +11,10 @@ export type UpcomingType = "annual" | "maintenance";
 
 export type AdPlacement = "dashboard_banner" | "expenses_inline";
 
-export type MaintenanceSource = "manufacturer_manual" | "generic";
+export type MaintenanceSource = "manufacturer_manual" | "generic" | "manual";
+export type MaintenanceKind = "service" | "inspection";
+export type MaintenanceAction = "replace" | "inspect" | "adjust";
+export type MaintenanceReviewAction = "inspect" | "replace";
 
 export type User = {
   id: string;
@@ -58,14 +61,37 @@ export type MaintenanceItem = {
   isEstimatedFromCurrentKm?: boolean;
   manualReference?: string;
   sourceUrl?: string;
+  kind?: MaintenanceKind;
+  action?: MaintenanceAction;
+  category?: string;
+  observation?: string;
+  description?: string;
+  includedInReviewId?: string;
+  checklistItems?: string[];
+};
+
+export type CreateMaintenanceItemInput = {
+  type: string;
+  estimatedCost: number;
+  lastKm: number;
+  lastDate: string;
+  intervalKm?: number;
+  intervalMonths?: number;
 };
 
 export type MaintenancePlanItem = {
   id: string;
   type: string;
+  category?: string;
   intervalKm?: number;
   intervalMonths?: number;
   estimatedCost: number;
+  kind?: MaintenanceKind;
+  action?: MaintenanceAction;
+  description?: string;
+  observation?: string;
+  reviewSchedule?: Partial<Record<number, MaintenanceReviewAction>>;
+  includedInReviewId?: string;
 };
 
 export type MaintenancePlan = {
@@ -88,6 +114,18 @@ export type AlertSettings = {
   emailEnabled: boolean;
 };
 
+export type ProtectionLevel = "none" | "bronze" | "silver" | "gold";
+
+export type ProtectionReserveInput = {
+  insuranceDeductible: number;
+  savedReserve: number;
+};
+
+export type ProtectionReserveSummary = ProtectionReserveInput & {
+  coveragePercent: number;
+  level: ProtectionLevel;
+};
+
 export type UpcomingEvent = {
   id: string;
   title: string;
@@ -103,6 +141,7 @@ export type DashboardSummary = {
   yearSpend: number;
   reserveSuggestion: number;
   reserveCoverage: number;
+  protectionReserve: ProtectionReserveSummary;
   nextEvents: UpcomingEvent[];
 };
 

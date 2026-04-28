@@ -1,4 +1,4 @@
-import { AnnualExpense, DashboardSummary, Expense, MaintenanceItem, UpcomingEvent, Vehicle } from "@/types/models";
+import { AnnualExpense, DashboardSummary, Expense, MaintenanceItem, ProtectionLevel, ProtectionReserveInput, ProtectionReserveSummary, UpcomingEvent, Vehicle } from "@/types/models";
 
 const TODAY = new Date("2026-03-19T12:00:00");
 
@@ -59,11 +59,33 @@ export const buildUpcomingEvents = (
   return [...annualEvents, ...maintenanceEvents].sort((a, b) => a.date.localeCompare(b.date));
 };
 
+export const buildProtectionReserveSummary = ({ insuranceDeductible, savedReserve }: ProtectionReserveInput): ProtectionReserveSummary => {
+  const hasValidValues = Number.isFinite(insuranceDeductible) && insuranceDeductible > 0 && Number.isFinite(savedReserve) && savedReserve >= 0;
+  const coveragePercent = hasValidValues ? Math.floor((savedReserve / insuranceDeductible) * 100) : 0;
+  let level: ProtectionLevel = "none";
+
+  if (coveragePercent >= 100) {
+    level = "gold";
+  } else if (coveragePercent >= 50) {
+    level = "silver";
+  } else if (coveragePercent >= 30) {
+    level = "bronze";
+  }
+
+  return {
+    insuranceDeductible: hasValidValues ? insuranceDeductible : 0,
+    savedReserve: hasValidValues ? savedReserve : 0,
+    coveragePercent,
+    level,
+  };
+};
+
 export const buildDashboardSummary = (
   expenses: Expense[],
   annualExpenses: AnnualExpense[],
   maintenance: MaintenanceItem[],
-  vehicle: Vehicle
+  vehicle: Vehicle,
+  protectionReserve: ProtectionReserveInput
 ): DashboardSummary => {
   const monthKey = TODAY.toISOString().slice(0, 7);
   const monthSpend = expenses.filter((item) => item.date.startsWith(monthKey)).reduce((sum, item) => sum + item.amount, 0);
@@ -78,6 +100,7 @@ export const buildDashboardSummary = (
     yearSpend,
     reserveSuggestion,
     reserveCoverage: 72,
+    protectionReserve: buildProtectionReserveSummary(protectionReserve),
     nextEvents: upcoming.slice(0, 4),
   };
 };
