@@ -13,14 +13,16 @@ export function AdBanner({ ad, onPress }: Props) {
     <Pressable accessibilityRole="button" accessibilityLabel={`${ad.title}. ${ad.cta}`} onPress={onPress} style={({ pressed }) => [styles.wrapper, pressed && styles.pressed]}>
       <Card style={styles.card}>
         <View style={styles.highlightBar} />
-        <View style={styles.topRow}>
-          <Text style={styles.badge}>Publicidade</Text>
-          <Text style={styles.sponsor}>{ad.sponsor}</Text>
-        </View>
-        <Text style={styles.title}>{ad.title}</Text>
-        <Text style={styles.description}>{ad.description}</Text>
-        <View style={styles.ctaRow}>
-          <Text style={styles.cta}>{ad.cta}</Text>
+        <View style={styles.content}>
+          <View style={styles.topRow}>
+            <Text style={styles.badge}>Publicidade</Text>
+            <Text style={styles.sponsor}>{ad.sponsor}</Text>
+          </View>
+          <Text style={styles.title}>{ad.title}</Text>
+          <Text style={styles.description}>{ad.description}</Text>
+          <View style={styles.ctaRow}>
+            <Text style={styles.cta}>{ad.cta}</Text>
+          </View>
         </View>
       </Card>
     </Pressable>
@@ -34,19 +36,19 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.backgroundStrong,
     borderColor: "#C9D1DB",
-    gap: spacing.sm,
+    overflow: "hidden",
+    padding: 0,
   },
   pressed: {
     opacity: 0.94,
   },
   highlightBar: {
     height: 6,
-    marginHorizontal: -spacing.md,
-    marginTop: -spacing.md,
-    marginBottom: spacing.xs,
-    borderTopLeftRadius: radii.lg,
-    borderTopRightRadius: radii.lg,
     backgroundColor: colors.primary,
+  },
+  content: {
+    padding: spacing.md,
+    gap: spacing.sm,
   },
   topRow: {
     flexDirection: "row",
