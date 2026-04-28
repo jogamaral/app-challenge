@@ -41,6 +41,9 @@ export default function ExpensesScreen() {
       <PrimaryButton title="Novo gasto" onPress={() => router.push("/expense/new")} />
       {inlineAd.data ? <AdBanner ad={inlineAd.data} onPress={handleAdPress} /> : null}
       <Card>
+        <SectionHeader title="Próximos gastos" subtitle="O que está vindo primeiro" right={<PrimaryButton title="Ver lista" variant="secondary" onPress={() => router.push("/upcoming")} />} />
+      </Card>
+      <Card>
         <SectionHeader title="Últimos gastos" subtitle="Histórico recente do veículo" />
         {expenses.isLoading ? <LoadingState /> : null}
         {expenses.isError ? <ErrorState title="Falha ao buscar gastos" description="Não deu para carregar seu histórico agora." onRetry={() => expenses.refetch()} /> : null}
