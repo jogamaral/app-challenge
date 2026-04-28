@@ -13,8 +13,8 @@ export type AdPlacement = "dashboard_banner" | "expenses_inline";
 
 export type MaintenanceSource = "manufacturer_manual" | "generic" | "manual";
 export type MaintenanceKind = "service" | "inspection";
-export type MaintenanceAction = "replace" | "inspect" | "adjust";
-export type MaintenanceReviewAction = "inspect" | "replace";
+export type MaintenanceAction = "replace" | "inspect" | "adjust" | "lubricate";
+export type MaintenanceReviewAction = "inspect" | "replace" | "lubricate";
 
 export type User = {
   id: string;
@@ -92,6 +92,7 @@ export type MaintenancePlanItem = {
   observation?: string;
   reviewSchedule?: Partial<Record<number, MaintenanceReviewAction>>;
   includedInReviewId?: string;
+  hybridOnly?: boolean;
 };
 
 export type MaintenancePlan = {

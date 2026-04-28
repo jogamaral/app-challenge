@@ -20,6 +20,7 @@ const actionLabels = {
   replace: "Troca",
   inspect: "Inspeção",
   adjust: "Ajuste",
+  lubricate: "Lubrificação",
 };
 
 const TODAY = "2026-03-19";

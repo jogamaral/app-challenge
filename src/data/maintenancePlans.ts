@@ -10,6 +10,17 @@ const allReviews = (action: MaintenanceReviewAction) =>
 
 const evenReviews = (action: MaintenanceReviewAction) => reviewSchedule([2, action], [4, action], [6, action], [8, action], [10, action]);
 
+const allReviews20 = (action: MaintenanceReviewAction) =>
+  reviewSchedule(
+    [1, action], [2, action], [3, action], [4, action], [5, action], [6, action], [7, action], [8, action], [9, action], [10, action],
+    [11, action], [12, action], [13, action], [14, action], [15, action], [16, action], [17, action], [18, action], [19, action], [20, action]
+  );
+
+const evenReviews20 = (action: MaintenanceReviewAction) =>
+  reviewSchedule([2, action], [4, action], [6, action], [8, action], [10, action], [12, action], [14, action], [16, action], [18, action], [20, action]);
+
+const everyFifthReview = (action: MaintenanceReviewAction) => reviewSchedule([5, action], [10, action], [15, action], [20, action]);
+
 export const maintenancePlans: MaintenancePlan[] = [
   {
     id: "chevrolet-onix-2024",
@@ -374,71 +385,243 @@ export const maintenancePlans: MaintenancePlan[] = [
     extractedAt: "2026-04-27",
     items: [
       {
-        id: "periodic-review",
-        type: "Revisão periódica Toyota",
+        id: "engine-oil-filter",
+        type: "Óleo e Filtro de Óleo",
+        category: "Motor",
         intervalKm: 10000,
         intervalMonths: 12,
-        estimatedCost: 650,
-        kind: "service",
-        action: "inspect",
-        description: "Serviço de revisão periódica Toyota a cada 12 meses ou 10.000 km.",
+        estimatedCost: 0,
+        action: "replace",
+        reviewSchedule: allReviews20("replace"),
       },
       {
-        id: "engine-oil",
-        type: "Óleo do motor",
+        id: "engine-coolant",
+        type: "Fluido de Arrefecimento do Motor",
+        category: "Motor",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: evenReviews20("inspect"),
+      },
+      {
+        id: "engine-air-filter",
+        type: "Filtro de Ar do Motor",
+        category: "Motor",
         intervalKm: 10000,
         intervalMonths: 12,
-        estimatedCost: 300,
-        kind: "service",
-        action: "replace",
-        description: "Troca do óleo do motor prevista nas revisões periódicas.",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: reviewSchedule([1, "inspect"], [2, "replace"], [3, "inspect"], [4, "replace"], [5, "inspect"], [6, "replace"], [7, "inspect"], [8, "replace"], [9, "inspect"], [10, "replace"], [11, "inspect"], [12, "replace"], [13, "inspect"], [14, "replace"], [15, "inspect"], [16, "replace"], [17, "inspect"], [18, "replace"], [19, "inspect"], [20, "replace"]),
       },
       {
-        id: "oil-filter",
-        type: "Filtro de óleo",
+        id: "spark-plugs",
+        type: "Velas de Ignição",
+        category: "Motor",
+        estimatedCost: 0,
+        action: "replace",
+        reviewSchedule: reviewSchedule([5, "replace"], [20, "replace"]),
+      },
+      {
+        id: "drive-belt",
+        type: "Correia de Acionamento",
+        category: "Motor",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: evenReviews20("inspect"),
+      },
+      {
+        id: "radiator-evaporator-hoses",
+        type: "Radiador, Evaporador e Mangueiras",
+        category: "Motor",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: evenReviews20("inspect"),
+      },
+      {
+        id: "hybrid-inverter-coolant",
+        type: "Fluido Arrefecimento Inversor",
+        category: "Sistema Híbrido",
+        estimatedCost: 0,
+        action: "inspect",
+        hybridOnly: true,
+        reviewSchedule: evenReviews20("inspect"),
+      },
+      {
+        id: "hybrid-battery-air-filter",
+        type: "Filtro Ar Bateria Híbrida",
+        category: "Sistema Híbrido",
+        estimatedCost: 0,
+        action: "lubricate",
+        hybridOnly: true,
+        reviewSchedule: reviewSchedule([1, "lubricate"], [2, "lubricate"], [3, "replace"], [4, "lubricate"], [5, "lubricate"], [6, "replace"], [7, "lubricate"], [8, "lubricate"], [9, "replace"], [10, "lubricate"], [11, "lubricate"], [12, "replace"], [13, "lubricate"], [14, "lubricate"], [15, "replace"], [16, "lubricate"], [17, "lubricate"], [18, "replace"], [19, "lubricate"], [20, "lubricate"]),
+      },
+      {
+        id: "cvt-transmission-fluid",
+        type: "Fluido Transmissão CVT",
+        category: "Transmissão",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: evenReviews20("inspect"),
+      },
+      {
+        id: "drive-shaft-boots",
+        type: "Eixo de Tração e Coifas",
+        category: "Transmissão",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: evenReviews20("inspect"),
+      },
+      {
+        id: "brake-pads-discs",
+        type: "Pastilha e Disco de Freio",
+        category: "Freio",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: allReviews20("inspect"),
+      },
+      {
+        id: "brake-fluid",
+        type: "Fluido de Freio",
+        category: "Freio",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: reviewSchedule([1, "inspect"], [2, "inspect"], [3, "replace"], [4, "inspect"], [5, "inspect"], [6, "replace"], [7, "inspect"], [8, "inspect"], [9, "replace"], [10, "inspect"], [11, "inspect"], [12, "replace"], [13, "inspect"], [14, "inspect"], [15, "replace"], [16, "inspect"], [17, "inspect"], [18, "replace"], [19, "inspect"], [20, "inspect"]),
+      },
+      {
+        id: "brake-pedal-parking",
+        type: "Pedal de Freio / Estacionamento",
+        category: "Freio",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: allReviews20("inspect"),
+      },
+      {
+        id: "brake-vacuum-pump",
+        type: "Bomba de Vácuo",
+        category: "Freio",
+        estimatedCost: 0,
+        action: "replace",
+      },
+      {
+        id: "brake-tubes-hoses",
+        type: "Tubos e Mangueiras de Freio",
+        category: "Freio",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: evenReviews20("inspect"),
+      },
+      {
+        id: "steering-box",
+        type: "Direção e Caixa de Direção",
+        category: "Suspensão",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: evenReviews20("inspect"),
+      },
+      {
+        id: "ball-joints-boots",
+        type: "Juntas Esféricas e Coifas",
+        category: "Suspensão",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: evenReviews20("inspect"),
+      },
+      {
+        id: "tires",
+        type: "Pneus",
+        category: "Suspensão",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: allReviews20("inspect"),
+      },
+      {
+        id: "front-rear-suspension",
+        type: "Suspensão Dianteira/Traseira",
+        category: "Suspensão",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: evenReviews20("inspect"),
+      },
+      {
+        id: "battery-12v",
+        type: "Bateria 12V",
+        category: "Elétrica",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: evenReviews20("inspect"),
+      },
+      {
+        id: "lights-horn",
+        type: "Luzes e buzina",
+        category: "Elétrica",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: allReviews20("inspect"),
+      },
+      {
+        id: "wipers-washers",
+        type: "Limpadores/lavadores",
+        category: "Elétrica",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: allReviews20("inspect"),
+      },
+      {
+        id: "fuel-tank-filter",
+        type: "Filtro combustível tanque",
+        category: "Combustível",
+        estimatedCost: 0,
+        action: "replace",
+        reviewSchedule: everyFifthReview("replace"),
+      },
+      {
+        id: "fuel-line-filter",
+        type: "Filtro combustível linha",
+        category: "Combustível",
         intervalKm: 10000,
         intervalMonths: 12,
-        estimatedCost: 110,
-        kind: "service",
+        estimatedCost: 0,
         action: "replace",
-        description: "Substituição do filtro de óleo junto da revisão.",
+        reviewSchedule: allReviews20("replace"),
       },
       {
-        id: "cabin-filter",
-        type: "Filtro do ar-condicionado",
-        intervalKm: 20000,
-        intervalMonths: 24,
-        estimatedCost: 160,
-        kind: "service",
+        id: "fuel-system-lines",
+        type: "Sistema combustível (linhas)",
+        category: "Combustível",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: evenReviews20("inspect"),
+      },
+      {
+        id: "canister",
+        type: "Cânister",
+        category: "Emissões",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: evenReviews20("inspect"),
+      },
+      {
+        id: "exhaust",
+        type: "Escapamento",
+        category: "Emissões",
+        estimatedCost: 0,
+        action: "inspect",
+        reviewSchedule: evenReviews20("inspect"),
+      },
+      {
+        id: "ac-filter",
+        type: "Filtro ar condicionado",
+        category: "Ar-condicionado",
+        estimatedCost: 0,
         action: "replace",
-        description: "Substituição periódica do filtro de cabine/ar-condicionado.",
+        reviewSchedule: allReviews20("replace"),
       },
       {
-        id: "brakes",
-        type: "Freios",
+        id: "hybrid-transmission-fluid",
+        type: "Fluido Transmissão Híbrida",
+        category: "Sistema Híbrido",
         estimatedCost: 0,
-        kind: "inspection",
         action: "inspect",
-        includedInReviewId: "periodic-review",
-        description: "Pastilhas, discos, pedal, freio de estacionamento, tubos e mangueiras.",
-      },
-      {
-        id: "tires-steering-suspension",
-        type: "Pneus, direção e suspensão",
-        estimatedCost: 0,
-        kind: "inspection",
-        action: "inspect",
-        includedInReviewId: "periodic-review",
-        description: "Calibragem/desgaste dos pneus, direção, articulações e suspensão.",
-      },
-      {
-        id: "fluids-belts-lights",
-        type: "Fluidos, correias e iluminação",
-        estimatedCost: 0,
-        kind: "inspection",
-        action: "inspect",
-        includedInReviewId: "periodic-review",
-        description: "Níveis de fluidos, correias, luzes, bateria e itens de segurança.",
+        hybridOnly: true,
       },
     ],
   },
@@ -467,7 +650,7 @@ const getNextScheduledReview = (currentKm: number, reviewSchedule?: Partial<Reco
     return undefined;
   }
 
-  return Array.from({ length: 10 }, (_, index) => index + 1).find((reviewNumber) => {
+  return Array.from({ length: 20 }, (_, index) => index + 1).find((reviewNumber) => {
     const reviewKm = reviewNumber * 10000;
     return reviewKm > currentKm && Boolean(reviewSchedule[reviewNumber]);
   });
@@ -475,6 +658,10 @@ const getNextScheduledReview = (currentKm: number, reviewSchedule?: Partial<Reco
 
 const getEstimatedLastKmForItem = (vehicle: Vehicle, item: MaintenancePlan["items"][number]) => {
   const nextScheduledReview = getNextScheduledReview(vehicle.currentKm, item.reviewSchedule);
+  if (nextScheduledReview && !item.intervalKm) {
+    return Math.max(0, nextScheduledReview * 10000 - 10000);
+  }
+
   if (!nextScheduledReview || !item.intervalKm) {
     return getEstimatedLastKm(vehicle.currentKm, item.intervalKm);
   }
@@ -483,7 +670,7 @@ const getEstimatedLastKmForItem = (vehicle: Vehicle, item: MaintenancePlan["item
 };
 
 export const buildMaintenanceFromPlan = (vehicle: Vehicle, plan: MaintenancePlan): MaintenanceItem[] =>
-  plan.items.filter((item) => item.kind !== "inspection").map((item) => {
+  plan.items.filter((item) => item.kind !== "inspection" && (item.intervalKm || item.intervalMonths || item.reviewSchedule) && (!item.hybridOnly || vehicle.version?.toLocaleLowerCase("pt-BR").includes("hybrid"))).map((item) => {
     const lastKm = getEstimatedLastKmForItem(vehicle, item);
     const nextScheduledReview = getNextScheduledReview(vehicle.currentKm, item.reviewSchedule);
     const legacyChecklistItems = plan.items
@@ -493,7 +680,7 @@ export const buildMaintenanceFromPlan = (vehicle: Vehicle, plan: MaintenancePlan
     return {
       id: `${plan.id}-${item.id}`,
       type: item.type,
-      intervalKm: item.intervalKm,
+      intervalKm: item.intervalKm ?? (item.reviewSchedule ? 10000 : undefined),
       intervalMonths: item.intervalMonths,
       lastKm,
       lastDate: TODAY_ISO,
