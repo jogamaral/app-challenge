@@ -1,18 +1,14 @@
-import { AdBanner } from "@/components/ui/AdBanner";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Card } from "@/components/ui/Card";
 import { FormField } from "@/components/ui/FormField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { SearchableSelectField } from "@/components/ui/SearchableSelectField";
 import { Screen } from "@/components/ui/Screen";
-import { ensureVehicleInCatalog, getBrandOptions, getModelOptions, getVersionOptions, getYearOptions, vehicleCatalog } from "@/data/vehicleCatalog";
+import { forecastVehicleCatalog, getBrandOptions, getModelOptions, getVersionOptions, getYearOptions } from "@/data/vehicleCatalog";
 import { queryClient, useApp } from "@/providers/AppProvider";
 import { mockApi } from "@/services/api/mockApi";
-import { mockAds } from "@/services/ads/mockAds";
-import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Linking } from "react-native";
 
 const sanitizeKmInput = (value: string) => value.replace(/[^0-9]/g, "");
 
@@ -26,29 +22,11 @@ export default function VehicleScreen() {
   const [currentKm, setCurrentKm] = useState(vehicle?.currentKm ? String(vehicle.currentKm) : "");
   const [monthlyKm, setMonthlyKm] = useState(vehicle?.monthlyKm ? String(vehicle.monthlyKm) : "");
   const [loading, setLoading] = useState(false);
-  const catalog = useMemo(() => ensureVehicleInCatalog(vehicleCatalog, vehicle), [vehicle]);
+  const catalog = forecastVehicleCatalog;
   const brandOptions = useMemo(() => getBrandOptions(catalog), [catalog]);
   const modelOptions = useMemo(() => getModelOptions(catalog, brand), [catalog, brand]);
   const yearOptions = useMemo(() => getYearOptions(catalog, brand, model), [catalog, brand, model]);
   const versionOptions = useMemo(() => getVersionOptions(catalog, brand, model, year), [catalog, brand, model, year]);
-  const authAd = useQuery({
-    queryKey: ["ads", "auth_banner"],
-    queryFn: () => mockAds.getAd("auth_banner"),
-    enabled: mockAds.isEnabled(),
-  });
-  const handleAdPress = () => {
-    if (!authAd.data) {
-      return;
-    }
-
-    const href = mockAds.getClickHref(authAd.data);
-    if (href.startsWith("/")) {
-      router.push(href);
-      return;
-    }
-
-    Linking.openURL(href);
-  };
 
   useEffect(() => {
     setBrand(vehicle?.brand ?? "");
@@ -129,7 +107,6 @@ export default function VehicleScreen() {
         title={isEditing ? "Edite seu veículo" : "Cadastre seu carro"}
         subtitle={isEditing ? "Atualize os dados usados para previsões, agenda e reserva mensal." : "Esses dados ajudam o app a prever manutenções e sugerir uma reserva mensal."}
       />
-      {authAd.data ? <AdBanner ad={authAd.data} onPress={handleAdPress} /> : null}
       <Card>
         <SearchableSelectField
           label="Marca"

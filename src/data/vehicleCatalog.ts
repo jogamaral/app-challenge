@@ -1,4 +1,5 @@
 import { Vehicle } from "@/types/models";
+import { maintenancePlans } from "@/data/maintenancePlans";
 
 export type SelectOption = {
   label: string;
@@ -15,7 +16,7 @@ type VehicleModelCatalog = {
   years: VehicleYearCatalog[];
 };
 
-type VehicleBrandCatalog = {
+export type VehicleBrandCatalog = {
   brand: string;
   models: VehicleModelCatalog[];
 };
@@ -148,6 +149,21 @@ export const vehicleCatalog: VehicleBrandCatalog[] = [
     ],
   },
 ];
+
+const hasMaintenancePlan = (brand: string, model: string, year: number) =>
+  maintenancePlans.some((plan) => plan.brand === brand && plan.model === model && plan.year === year);
+
+export const forecastVehicleCatalog: VehicleBrandCatalog[] = vehicleCatalog
+  .map((brandEntry) => ({
+    brand: brandEntry.brand,
+    models: brandEntry.models
+      .map((modelEntry) => ({
+        model: modelEntry.model,
+        years: modelEntry.years.filter((yearEntry) => hasMaintenancePlan(brandEntry.brand, modelEntry.model, yearEntry.year)),
+      }))
+      .filter((modelEntry) => modelEntry.years.length > 0),
+  }))
+  .filter((brandEntry) => brandEntry.models.length > 0);
 
 const sortByLabel = (left: SelectOption, right: SelectOption) => left.label.localeCompare(right.label, "pt-BR");
 

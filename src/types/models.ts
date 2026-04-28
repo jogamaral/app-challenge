@@ -9,7 +9,7 @@ export type ExpenseCategory =
 
 export type UpcomingType = "annual" | "maintenance";
 
-export type AdPlacement = "auth_banner" | "dashboard_banner" | "expenses_inline";
+export type AdPlacement = "dashboard_banner" | "expenses_inline";
 
 export type MaintenanceSource = "manufacturer_manual" | "generic";
 

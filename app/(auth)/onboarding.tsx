@@ -1,14 +1,11 @@
-import { AdBanner } from "@/components/ui/AdBanner";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Card } from "@/components/ui/Card";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { Screen } from "@/components/ui/Screen";
 import { useApp } from "@/providers/AppProvider";
-import { mockAds } from "@/services/ads/mockAds";
 import { colors, radii, spacing } from "@/theme/tokens";
-import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { Linking, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 const points = [
   { title: "Veja quanto gastou", text: "Resumo do mês e do ano logo na entrada do app." },
@@ -18,29 +15,10 @@ const points = [
 
 export default function OnboardingScreen() {
   const { finishOnboarding } = useApp();
-  const authAd = useQuery({
-    queryKey: ["ads", "auth_banner"],
-    queryFn: () => mockAds.getAd("auth_banner"),
-    enabled: mockAds.isEnabled(),
-  });
-  const handleAdPress = () => {
-    if (!authAd.data) {
-      return;
-    }
-
-    const href = mockAds.getClickHref(authAd.data);
-    if (href.startsWith("/")) {
-      router.push(href);
-      return;
-    }
-
-    Linking.openURL(href);
-  };
 
   return (
     <Screen>
       <AppHeader eyebrow="AutoPlano" title="Seu carro em dia e seu bolso sob controle" subtitle="Um app simples para entender o custo real do veículo sem planilha complicada." />
-      {authAd.data ? <AdBanner ad={authAd.data} onPress={handleAdPress} /> : null}
       <Card>
         <View style={styles.heroBadge}><Text style={styles.heroBadgeText}>MVP de previsibilidade financeira</Text></View>
         <Text style={styles.heroTitle}>Tudo o que você precisa saber em poucos segundos</Text>

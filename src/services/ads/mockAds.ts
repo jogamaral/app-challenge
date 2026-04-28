@@ -7,17 +7,6 @@ const env = (globalThis as { process?: { env?: Record<string, string | undefined
 const ENABLE_MOCK_ADS = env?.EXPO_PUBLIC_ENABLE_MOCK_ADS !== "false";
 
 const adsByPlacement: Record<AdPlacement, MockAd> = {
-  auth_banner: {
-    id: "ad-auth-1",
-    placement: "auth_banner",
-    title: "Compare seguro, revisão e assistência em um só lugar",
-    description: "Um mock pensado para validar a experiência de publicidade já no fluxo inicial.",
-    cta: "Conhecer parceiros",
-    sponsor: "Vitrine AutoPlano",
-    actionSlug: "parceiros-autoplano",
-    externalUrl: "https://autoplano.app/parceiros",
-    variant: "banner",
-  },
   dashboard_banner: {
     id: "ad-dashboard-1",
     placement: "dashboard_banner",
@@ -56,28 +45,6 @@ const isLocalPreviewHost = () => {
 const getLocalAdPath = (slug: string) => `/ad?slug=${encodeURIComponent(slug)}`;
 
 const landingPagesBySlug: Record<string, MockAdLandingPage> = {
-  "parceiros-autoplano": {
-    slug: "parceiros-autoplano",
-    eyebrow: "Publicidade",
-    title: "Parceiros escolhidos para reduzir o custo do carro",
-    subtitle: "Uma vitrine mockada para validar a jornada de clique já nas telas iniciais.",
-    sponsor: "Vitrine AutoPlano",
-    offerLabel: "Seguro, revisão e assistência em um só lugar",
-    primaryCta: "Tenho interesse",
-    secondaryCta: "Voltar ao app",
-    heroDescription: "Nesta página o usuário encontraria parceiros filtrados por perfil, localização e tipo de necessidade, com rastreamento de conversão por placement.",
-    benefits: [
-      "Comparação simples entre parceiros com foco em economia.",
-      "Experiência consistente entre web e app sem sair do fluxo.",
-      "Espaço para medir clique, visita e intenção de contato.",
-    ],
-    steps: [
-      "Escolha a categoria do parceiro que deseja conhecer.",
-      "Veja benefícios e condições destacadas.",
-      "Siga para a oferta final em uma integração real.",
-    ],
-    disclaimer: "Página mockada para validar UI, navegação e destaque comercial antes da integração com uma plataforma de anúncios.",
-  },
   "seguro-com-desconto": {
     slug: "seguro-com-desconto",
     eyebrow: "Publicidade",
