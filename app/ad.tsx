@@ -1,6 +1,7 @@
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Card } from "@/components/ui/Card";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { HeaderBackButton } from "@/components/ui/HeaderBackButton";
 import { LoadingState } from "@/components/ui/LoadingState";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { Screen } from "@/components/ui/Screen";
@@ -22,8 +23,8 @@ export default function AdLandingPage() {
 
   return (
     <Screen>
+      <HeaderBackButton label="Oferta do parceiro" />
       <AppHeader
-        eyebrow="Destino patrocinado"
         title="Oferta do parceiro"
         subtitle="Página mockada para validar o fluxo após o clique em um anúncio."
       />

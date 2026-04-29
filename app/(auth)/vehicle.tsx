@@ -1,6 +1,7 @@
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Card } from "@/components/ui/Card";
 import { FormField } from "@/components/ui/FormField";
+import { HeaderBackButton } from "@/components/ui/HeaderBackButton";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { SearchableSelectField } from "@/components/ui/SearchableSelectField";
 import { Screen } from "@/components/ui/Screen";
@@ -102,8 +103,9 @@ export default function VehicleScreen() {
 
   return (
     <Screen>
+      {isEditing ? <HeaderBackButton label="Veículo" /> : null}
       <AppHeader
-        eyebrow={isEditing ? "Veículo" : "Etapa 2 de 2"}
+        eyebrow={isEditing ? undefined : "Etapa 2 de 2"}
         title={isEditing ? "Edite seu veículo" : "Cadastre seu carro"}
         subtitle={isEditing ? "Atualize os dados usados para previsões, agenda e reserva mensal." : "Esses dados ajudam o app a prever manutenções e sugerir uma reserva mensal."}
       />

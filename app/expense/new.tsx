@@ -2,6 +2,7 @@ import { AppHeader } from "@/components/ui/AppHeader";
 import { Card } from "@/components/ui/Card";
 import { DateField } from "@/components/ui/DateField";
 import { FormField } from "@/components/ui/FormField";
+import { HeaderBackButton } from "@/components/ui/HeaderBackButton";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { Screen } from "@/components/ui/Screen";
 import { queryClient } from "@/providers/AppProvider";
@@ -49,7 +50,8 @@ export default function NewExpenseScreen() {
 
   return (
     <Screen>
-      <AppHeader eyebrow="Novo gasto" title="Registrar despesa" subtitle="Preencha somente o essencial para não perder o hábito." />
+      <HeaderBackButton label="Novo gasto" />
+      <AppHeader title="Registrar despesa" subtitle="Preencha somente o essencial para não perder o hábito." />
       <Card>
         <Text style={styles.label}>Categoria</Text>
         <View style={styles.chipsWrap}>
