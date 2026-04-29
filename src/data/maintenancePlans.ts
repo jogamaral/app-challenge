@@ -669,6 +669,88 @@ const getEstimatedLastKmForItem = (vehicle: Vehicle, item: MaintenancePlan["item
   return Math.max(0, nextScheduledReview * 10000 - item.intervalKm);
 };
 
+const formatKm = (value: number) => `${value.toLocaleString("pt-BR")} km`;
+
+const formatMonths = (value: number) => `${value} ${value === 1 ? "mês" : "meses"}`;
+
+const formatList = (items: string[]) => {
+  if (items.length <= 1) {
+    return items[0] ?? "";
+  }
+
+  return `${items.slice(0, -1).join(", ")} e ${items[items.length - 1]}`;
+};
+
+const getReviewKms = (reviewSchedule?: Partial<Record<number, MaintenanceReviewAction>>) => {
+  if (!reviewSchedule) {
+    return [];
+  }
+
+  return Object.keys(reviewSchedule)
+    .map(Number)
+    .filter((reviewNumber) => Number.isFinite(reviewNumber) && reviewNumber > 0)
+    .sort((left, right) => left - right)
+    .map((reviewNumber) => reviewNumber * 10000);
+};
+
+const getRegularReviewText = (reviewKms: number[]) => {
+  if (reviewKms.length < 3) {
+    return undefined;
+  }
+
+  const interval = reviewKms[1] - reviewKms[0];
+  const isRegular = interval > 0 && reviewKms.every((reviewKm, index) => index === 0 || reviewKm - reviewKms[index - 1] === interval);
+
+  if (!isRegular) {
+    return undefined;
+  }
+
+  if (interval === 10000 && reviewKms[0] === 10000) {
+    return "em todas as revisões de 10.000 km";
+  }
+
+  return `a cada ${formatKm(interval)}, a partir de ${formatKm(reviewKms[0])}`;
+};
+
+const isEveryTenThousandReview = (reviewKms: number[]) =>
+  reviewKms.length > 0 && reviewKms.every((reviewKm, index) => reviewKm === (index + 1) * 10000);
+
+const getScheduleReferenceText = (item: MaintenancePlan["items"][number]) => {
+  const intervalParts = [
+    item.intervalKm ? formatKm(item.intervalKm) : undefined,
+    item.intervalMonths ? formatMonths(item.intervalMonths) : undefined,
+  ].filter(Boolean) as string[];
+  const reviewKms = getReviewKms(item.reviewSchedule);
+
+  if (intervalParts.length > 0 && (reviewKms.length === 0 || isEveryTenThousandReview(reviewKms))) {
+    return `a cada ${intervalParts.join(" ou ")}`;
+  }
+
+  if (reviewKms.length === 0) {
+    return undefined;
+  }
+
+  const regularText = getRegularReviewText(reviewKms);
+  if (regularText) {
+    return regularText;
+  }
+
+  return `nas revisões de ${formatList(reviewKms.map(formatKm))}`;
+};
+
+const getManualReferenceForItem = (plan: MaintenancePlan, item: MaintenancePlan["items"][number]) => {
+  const scheduleText = getScheduleReferenceText(item);
+  if (!scheduleText) {
+    return plan.manualReference;
+  }
+
+  const prefix = plan.id === "toyota-corolla-2024"
+    ? "Toyota Brasil - Revisões periódicas Corolla 2024."
+    : plan.manualReference.split(".")[0] + ".";
+
+  return `${prefix} Item previsto ${scheduleText}.`;
+};
+
 export const buildMaintenanceFromPlan = (vehicle: Vehicle, plan: MaintenancePlan): MaintenanceItem[] =>
   plan.items.filter((item) => item.kind !== "inspection" && (item.intervalKm || item.intervalMonths || item.reviewSchedule) && (!item.hybridOnly || vehicle.version?.toLocaleLowerCase("pt-BR").includes("hybrid"))).map((item) => {
     const lastKm = getEstimatedLastKmForItem(vehicle, item);
@@ -689,7 +771,7 @@ export const buildMaintenanceFromPlan = (vehicle: Vehicle, plan: MaintenancePlan
       source: plan.source,
       sourceLabel: plan.sourceLabel,
       isEstimatedFromCurrentKm: true,
-      manualReference: plan.manualReference,
+      manualReference: getManualReferenceForItem(plan, item),
       sourceUrl: plan.sourceUrl,
       kind: item.kind ?? "service",
       action: nextScheduledReview ? item.reviewSchedule?.[nextScheduledReview] ?? item.action : item.action,
