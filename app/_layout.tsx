@@ -16,6 +16,7 @@ export default function RootLayout() {
           <Stack.Screen name="ad" options={{ presentation: "card" }} />
           <Stack.Screen name="upcoming" options={{ presentation: "card" }} />
           <Stack.Screen name="expense/new" options={{ presentation: "modal" }} />
+          <Stack.Screen name="vehicle/mileage" options={{ presentation: "modal" }} />
         </Stack>
       </AppProvider>
     </SafeAreaProvider>

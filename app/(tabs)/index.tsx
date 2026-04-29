@@ -112,6 +112,7 @@ export default function DashboardScreen() {
           </Card>
           <Card>
             <SectionHeader title="Ações rápidas" subtitle="Atalhos para tarefas do dia a dia" />
+            <PrimaryButton title="Adicionar km" onPress={() => router.push("/vehicle/mileage")} />
             <PrimaryButton title="Novo gasto" onPress={() => router.push("/expense/new")} />
             <PrimaryButton title="Ver manutenção preventiva" variant="secondary" onPress={() => router.push("/(tabs)/agenda")} />
           </Card>
