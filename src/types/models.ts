@@ -79,6 +79,8 @@ export type CreateMaintenanceItemInput = {
   intervalMonths?: number;
 };
 
+export type UpdateMaintenanceItemInput = CreateMaintenanceItemInput;
+
 export type MaintenancePlanItem = {
   id: string;
   type: string;

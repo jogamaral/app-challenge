@@ -9,6 +9,7 @@ import { UpcomingEventItem } from "@/components/ui/ListItems";
 import { mockApi } from "@/services/api/mockApi";
 import { colors } from "@/theme/tokens";
 import { useQuery } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function UpcomingScreen() {
@@ -26,7 +27,9 @@ export default function UpcomingScreen() {
         {upcoming.isLoading ? <LoadingState /> : null}
         {upcoming.isError ? <ErrorState title="Erro ao buscar próximos gastos" description="Não foi possível montar sua previsão agora." onRetry={() => upcoming.refetch()} /> : null}
         {upcoming.data && upcoming.data.length === 0 ? <EmptyState title="Nenhuma despesa próxima" description="Quando houver obrigações ou manutenções previstas, elas aparecem aqui." /> : null}
-        {upcoming.data?.map((item) => <UpcomingEventItem key={item.id} item={item} />)}
+        {upcoming.data?.map((item) => (
+          <UpcomingEventItem key={item.id} item={item} onPress={() => router.push({ pathname: "/upcoming/edit", params: { id: item.id, type: item.type } })} />
+        ))}
       </Card>
     </Screen>
   );

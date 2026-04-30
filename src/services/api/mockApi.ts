@@ -1,7 +1,7 @@
 import { readJson, writeJson } from "@/lib/persistence";
 import { buildMaintenanceFromPlan, getMaintenancePlanForVehicle } from "@/data/maintenancePlans";
 import { buildDashboardSummary, buildUpcomingEvents, getMaintenanceForecast } from "@/lib/forecast";
-import { AlertSettings, AnnualExpense, CreateMaintenanceItemInput, DashboardSummary, Expense, ExpenseCategory, MaintenanceItem, ProtectionReserveInput, UpcomingEvent, User, Vehicle } from "@/types/models";
+import { AlertSettings, AnnualExpense, CreateMaintenanceItemInput, DashboardSummary, Expense, ExpenseCategory, MaintenanceItem, ProtectionReserveInput, UpcomingEvent, UpdateMaintenanceItemInput, User, Vehicle } from "@/types/models";
 
 const wait = (ms = 450) => new Promise((resolve) => setTimeout(resolve, ms));
 const MOCK_DB_STORAGE_KEY = "autoplano.mock-db";
@@ -61,6 +61,41 @@ const db: MockDb = {
 
 const persistDb = () => writeJson(MOCK_DB_STORAGE_KEY, db);
 
+const normalizeMaintenanceInput = (payload: UpdateMaintenanceItemInput) => {
+  const type = payload.type.trim();
+  const intervalKm = payload.intervalKm && payload.intervalKm > 0 ? payload.intervalKm : undefined;
+  const intervalMonths = payload.intervalMonths && payload.intervalMonths > 0 ? payload.intervalMonths : undefined;
+
+  if (!type) {
+    throw new Error("Nome da manutenção inválido");
+  }
+
+  if (!Number.isFinite(payload.estimatedCost) || payload.estimatedCost < 0) {
+    throw new Error("Custo estimado inválido");
+  }
+
+  if (!Number.isFinite(payload.lastKm) || payload.lastKm < 0) {
+    throw new Error("Quilometragem inválida");
+  }
+
+  if (!payload.lastDate) {
+    throw new Error("Data inválida");
+  }
+
+  if (!intervalKm && !intervalMonths) {
+    throw new Error("Informe um intervalo");
+  }
+
+  return {
+    type,
+    estimatedCost: payload.estimatedCost,
+    lastKm: payload.lastKm,
+    lastDate: payload.lastDate,
+    intervalKm,
+    intervalMonths,
+  };
+};
+
 const syncMaintenanceForVehicle = (vehicle: Vehicle) => {
   const manualItems = db.maintenance.filter((item) => item.source === "manual");
   const maintenancePlan = getMaintenancePlanForVehicle(vehicle);
@@ -76,6 +111,10 @@ const syncMaintenanceForVehicle = (vehicle: Vehicle) => {
     return currentItem
       ? {
           ...nextItem,
+          type: currentItem.type,
+          estimatedCost: currentItem.estimatedCost,
+          intervalKm: currentItem.intervalKm,
+          intervalMonths: currentItem.intervalMonths,
           lastKm: currentItem.lastKm,
           lastDate: currentItem.lastDate,
           status: currentItem.status,
@@ -160,6 +199,42 @@ export const mockApi = {
     return expense;
   },
 
+  async getAnnualExpense(id: string) {
+    await wait();
+    const item = db.annualExpenses.find((entry) => entry.id === id);
+    if (!item) {
+      throw new Error("Despesa anual não encontrada");
+    }
+    return item;
+  },
+
+  async updateAnnualExpense(id: string, payload: Omit<AnnualExpense, "id">) {
+    await wait();
+    const item = db.annualExpenses.find((entry) => entry.id === id);
+    if (!item) {
+      throw new Error("Despesa anual não encontrada");
+    }
+
+    const type = payload.type.trim();
+    if (!type) {
+      throw new Error("Nome da despesa inválido");
+    }
+
+    if (!Number.isFinite(payload.value) || payload.value <= 0) {
+      throw new Error("Valor da despesa inválido");
+    }
+
+    if (!payload.dueDate) {
+      throw new Error("Data de vencimento inválida");
+    }
+
+    item.type = type;
+    item.value = payload.value;
+    item.dueDate = payload.dueDate;
+    persistDb();
+    return item;
+  },
+
   async getUpcomingEvents(): Promise<UpcomingEvent[]> {
     await wait();
     if (!db.vehicle) {
@@ -178,45 +253,53 @@ export const mockApi = {
     return db.maintenance.map((item) => ({ ...item, forecast: getMaintenanceForecast(item, db.vehicle!) }));
   },
 
+  async getMaintenanceItem(id: string) {
+    await wait();
+    if (db.vehicle) {
+      syncMaintenanceForVehicle(db.vehicle);
+    }
+    const item = db.maintenance.find((entry) => entry.id === id);
+    if (!item) {
+      throw new Error("Manutenção não encontrada");
+    }
+    return item;
+  },
+
   async createMaintenanceItem(payload: CreateMaintenanceItemInput) {
     await wait();
-    const type = payload.type.trim();
-    const intervalKm = payload.intervalKm && payload.intervalKm > 0 ? payload.intervalKm : undefined;
-    const intervalMonths = payload.intervalMonths && payload.intervalMonths > 0 ? payload.intervalMonths : undefined;
+    const input = normalizeMaintenanceInput(payload);
 
-    if (!type) {
-      throw new Error("Nome da manutenção inválido");
-    }
-
-    if (!Number.isFinite(payload.estimatedCost) || payload.estimatedCost <= 0) {
+    if (input.estimatedCost <= 0) {
       throw new Error("Custo estimado inválido");
-    }
-
-    if (!Number.isFinite(payload.lastKm) || payload.lastKm < 0) {
-      throw new Error("Quilometragem inválida");
-    }
-
-    if (!payload.lastDate) {
-      throw new Error("Data inválida");
-    }
-
-    if (!intervalKm && !intervalMonths) {
-      throw new Error("Informe um intervalo");
     }
 
     const item: MaintenanceItem = {
       id: `manual-${Date.now()}`,
-      type,
-      estimatedCost: payload.estimatedCost,
-      lastKm: payload.lastKm,
-      lastDate: payload.lastDate,
-      intervalKm,
-      intervalMonths,
+      ...input,
       status: "upcoming",
       source: "manual",
     };
 
     db.maintenance.push(item);
+    persistDb();
+    return item;
+  },
+
+  async updateMaintenanceItem(id: string, payload: UpdateMaintenanceItemInput) {
+    await wait();
+    const item = db.maintenance.find((entry) => entry.id === id);
+    if (!item) {
+      throw new Error("Manutenção não encontrada");
+    }
+
+    const input = normalizeMaintenanceInput(payload);
+    item.type = input.type;
+    item.estimatedCost = input.estimatedCost;
+    item.lastKm = input.lastKm;
+    item.lastDate = input.lastDate;
+    item.intervalKm = input.intervalKm;
+    item.intervalMonths = input.intervalMonths;
+    item.isEstimatedFromCurrentKm = false;
     persistDb();
     return item;
   },
